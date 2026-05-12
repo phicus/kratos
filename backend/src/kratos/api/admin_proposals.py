@@ -88,9 +88,7 @@ async def edit_proposal(
 
 
 @router.post("/{proposal_id}/exclude", status_code=204)
-async def exclude_proposal(
-    proposal_id: int, admin: SessionUser = Depends(require_admin)
-) -> None:
+async def exclude_proposal(proposal_id: int, admin: SessionUser = Depends(require_admin)) -> None:
     with connection() as conn, transaction(conn):
         _require_preparacion(conn)
         existing = proposal.get(conn, proposal_id)
@@ -110,9 +108,7 @@ async def exclude_proposal(
 
 
 @router.post("/{proposal_id}/restore", status_code=204)
-async def restore_proposal(
-    proposal_id: int, admin: SessionUser = Depends(require_admin)
-) -> None:
+async def restore_proposal(proposal_id: int, admin: SessionUser = Depends(require_admin)) -> None:
     with connection() as conn, transaction(conn):
         _require_preparacion(conn)
         existing = proposal.get(conn, proposal_id)
@@ -159,9 +155,7 @@ async def merge_proposals(
 
 
 @router.post("/{proposal_id}/unmerge", status_code=204)
-async def unmerge_proposal(
-    proposal_id: int, admin: SessionUser = Depends(require_admin)
-) -> None:
+async def unmerge_proposal(proposal_id: int, admin: SessionUser = Depends(require_admin)) -> None:
     with connection() as conn, transaction(conn):
         _require_preparacion(conn)
         parents = proposal.unmerge(conn, proposal_id)
@@ -220,7 +214,5 @@ async def import_proposals(
 
     with connection() as conn, transaction(conn):
         _require_preparacion(conn)
-        imported, skipped = proposal.import_csv_text(
-            conn, csv_text, admin_email=admin.email
-        )
+        imported, skipped = proposal.import_csv_text(conn, csv_text, admin_email=admin.email)
     return ImportCsvResult(imported=imported, skipped=skipped)

@@ -1,0 +1,6 @@
+# Code owners reciben auto-asignación de review en PRs.
+# Sintaxis: <pattern> <@user-or-team> [@another-user]
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: ambos admins de Kratos revisan todo.
+* @jgmel @epastor

@@ -57,10 +57,7 @@ export const admin = {
   importCsv: (file: File) => {
     const fd = new FormData();
     fd.append('file', file);
-    return api.postForm<{ imported: number; skipped: number }>(
-      '/api/admin/proposals/import',
-      fd,
-    );
+    return api.postForm<{ imported: number; skipped: number }>('/api/admin/proposals/import', fd);
   },
   downloadResultsCsv: () => api.rawGet('/api/results.csv'),
 };

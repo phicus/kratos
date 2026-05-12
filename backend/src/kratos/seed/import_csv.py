@@ -20,7 +20,9 @@ from ..models import proposal
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Importar propuestas desde un CSV de Google Forms.")
+    parser = argparse.ArgumentParser(
+        description="Importar propuestas desde un CSV de Google Forms."
+    )
     parser.add_argument("csv_path", type=Path)
     parser.add_argument(
         "--admin",

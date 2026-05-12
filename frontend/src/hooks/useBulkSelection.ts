@@ -40,8 +40,7 @@ export function useBulkSelection<T extends { id: number }>(): BulkSelection<T> {
   const helpers = useMemo(
     () => ({
       isSelected: (id: number) => selected.has(id),
-      allChecked: (items: T[]) =>
-        items.length > 0 && items.every((i) => selected.has(i.id)),
+      allChecked: (items: T[]) => items.length > 0 && items.every((i) => selected.has(i.id)),
       someChecked: (items: T[]) => items.some((i) => selected.has(i.id)),
       ids: () => Array.from(selected),
     }),

@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { ConfirmModal } from '../../components/ui/Modal';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { usePeriod } from '../../hooks/usePeriod';
 import { admin } from '../../api/endpoints';
 

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import csv
 import sqlite3
+from collections.abc import Iterable
 from io import StringIO
-from typing import Iterable
 
 from . import audit
 
@@ -223,7 +223,9 @@ def merge(
     if any(p["status"] != "votable" for p in parents):
         from fastapi import HTTPException
 
-        raise HTTPException(status_code=409, detail="Todas las propuestas padre deben ser 'votable'.")
+        raise HTTPException(
+            status_code=409, detail="Todas las propuestas padre deben ser 'votable'."
+        )
     child_id = create(
         conn,
         name=name,

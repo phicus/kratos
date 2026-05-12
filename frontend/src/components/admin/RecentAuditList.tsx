@@ -58,9 +58,7 @@ export function RecentAuditList({ entries, onSeeAll }: Props) {
           {five.map((row, i) => (
             <li key={i} className="adm-audit-row" role="listitem">
               <span className="adm-audit-ts">{formatTimestamp(row.occurred_at)}</span>
-              <Badge variant={ACTION_TO_VARIANT[row.action] ?? 'neutral'}>
-                {row.action}
-              </Badge>
+              <Badge variant={ACTION_TO_VARIANT[row.action] ?? 'neutral'}>{row.action}</Badge>
               <span className="adm-audit-admin">{row.admin_email}</span>
               <span className="adm-audit-ids">{summarizeTargets(row.target_ids)}</span>
             </li>

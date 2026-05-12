@@ -41,3 +41,7 @@ coverage/
 htmlcov/
 playwright-report/
 test-results/
+
+# CI / test reports + TS incremental cache (build artefacts, never committed)
+**/*-junit.xml
+**/tsconfig.tsbuildinfo

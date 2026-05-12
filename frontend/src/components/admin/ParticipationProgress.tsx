@@ -8,14 +8,8 @@ interface Props {
   onQuorumChange: (n: number | null) => void | Promise<void>;
 }
 
-export function ParticipationProgress({
-  votersCount,
-  expectedQuorum,
-  onQuorumChange,
-}: Props) {
-  const [draft, setDraft] = useState<string>(
-    expectedQuorum !== null ? String(expectedQuorum) : '',
-  );
+export function ParticipationProgress({ votersCount, expectedQuorum, onQuorumChange }: Props) {
+  const [draft, setDraft] = useState<string>(expectedQuorum !== null ? String(expectedQuorum) : '');
   const [saving, setSaving] = useState(false);
 
   const onSave = async () => {
@@ -58,9 +52,7 @@ export function ParticipationProgress({
               '¡Todas las personas han votado!'
             ) : (
               <>
-                <strong className="text-fg">
-                  {Math.max(0, expectedQuorum - votersCount)}
-                </strong>{' '}
+                <strong className="text-fg">{Math.max(0, expectedQuorum - votersCount)}</strong>{' '}
                 personas todavía no han votado.
               </>
             )}
@@ -97,7 +89,10 @@ export function ParticipationProgress({
             {votersCount}
             <small> papeletas emitidas</small>
           </div>
-          <div className="part-quorum-row" style={{ marginTop: 16, borderTop: 'none', paddingTop: 0 }}>
+          <div
+            className="part-quorum-row"
+            style={{ marginTop: 16, borderTop: 'none', paddingTop: 0 }}
+          >
             <label htmlFor="quorum-edit">Aforo esperado:</label>
             <Input
               id="quorum-edit"

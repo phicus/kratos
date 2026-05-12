@@ -36,11 +36,7 @@ export function ScoreSelectorChips({ value, onChange, ariaLabel, disabled }: Pro
   );
 
   return (
-    <div
-      role="radiogroup"
-      aria-label={ariaLabel}
-      className="flex flex-wrap gap-1.5"
-    >
+    <div role="radiogroup" aria-label={ariaLabel} className="flex flex-wrap gap-1.5">
       {SCORES.map((n, idx) => {
         const selected = value === n;
         return (

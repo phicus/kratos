@@ -36,14 +36,14 @@ def _isolate_settings(tmp_path, monkeypatch):
 
 
 @pytest.fixture
-def init_db(_isolate_settings):  # noqa: ARG001 — depende del autouse para tener env listo
+def init_db(_isolate_settings):
     from kratos.db import init_db as _init
 
     _init()
 
 
 @pytest.fixture
-def app(init_db):  # noqa: ARG001
+def app(init_db):
     from kratos.main import create_app
 
     return create_app()

@@ -12,12 +12,7 @@ interface Props {
 
 export function MetricCard({ counter, label, sub, icon: Icon, onClick, disabled }: Props) {
   return (
-    <button
-      type="button"
-      className="adm-metric"
-      onClick={onClick}
-      disabled={disabled || !onClick}
-    >
+    <button type="button" className="adm-metric" onClick={onClick} disabled={disabled || !onClick}>
       <span className="adm-metric-icon" aria-hidden="true">
         {Icon ? <Icon size={14} /> : null}
       </span>

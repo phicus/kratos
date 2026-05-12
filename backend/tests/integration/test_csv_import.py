@@ -10,7 +10,7 @@ CSV_HEADER = (
     "¿Cuál sería el nombre de la idea/proyecto?,"
     "Describe cual es el objetivo de la idea/proyecto. ¿Qué soluciona o facilita?,"
     "¿Sabrías explicar como lo harías? (OPCIONAL),"
-    "\"¿Podrías estimar si se podría hacer en un día o se necesitarían varios? (OPCIONAL, sólo si sabes cómo se haría)\","
+    '"¿Podrías estimar si se podría hacer en un día o se necesitarían varios? (OPCIONAL, sólo si sabes cómo se haría)",'
     "VOTOS\n"
 )
 

@@ -45,9 +45,7 @@ async def get_participation(
             "WHERE period_id = ? ORDER BY voted_at DESC, id DESC",
             (period.PERIOD_ID,),
         ).fetchall()
-    voters = [
-        VoterReceiptSummary(email=r["user_email"], voted_at=r["voted_at"]) for r in rows
-    ]
+    voters = [VoterReceiptSummary(email=r["user_email"], voted_at=r["voted_at"]) for r in rows]
     return ParticipationData(
         voters_count=len(voters),
         expected_quorum=p.get("expected_quorum"),

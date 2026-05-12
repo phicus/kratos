@@ -6,8 +6,7 @@ import sqlite3
 
 
 def ranking(conn: sqlite3.Connection) -> list[dict]:
-    rows = conn.execute(
-        """
+    rows = conn.execute("""
         SELECT p.id          AS proposal_id,
                p.name        AS name,
                COALESCE(SUM(vs.score), 0)            AS total_score,
@@ -17,8 +16,7 @@ def ranking(conn: sqlite3.Connection) -> list[dict]:
         WHERE p.status = 'votable'
         GROUP BY p.id
         ORDER BY total_score DESC, name COLLATE NOCASE ASC
-        """
-    ).fetchall()
+        """).fetchall()
     return [
         {
             "proposal_id": r["proposal_id"],

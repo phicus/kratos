@@ -9,9 +9,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:ci": "vitest run --reporter=junit --outputFile=frontend-junit.xml",
     "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write src"
+    "lint:check": "eslint src --ext .ts,.tsx --max-warnings 0 && prettier --check \"src/**/*.{ts,tsx,css,html,json}\"",
+    "format": "eslint src --ext .ts,.tsx --fix && prettier --write \"src/**/*.{ts,tsx,css,html,json}\""
   },
   "dependencies": {
     "lucide-react": "^0.456.0",

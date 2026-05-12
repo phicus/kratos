@@ -1,6 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { type ReactNode } from 'react';
-import { ClipboardList, GitMerge, LayoutDashboard, PlayCircle, Settings2, Users } from 'lucide-react';
+import {
+  ClipboardList,
+  GitMerge,
+  LayoutDashboard,
+  PlayCircle,
+  Settings2,
+  Users,
+} from 'lucide-react';
 import { AppShell } from '../../components/AppShell';
 import { useRequireAdmin } from '../../hooks/useRequireAdmin';
 import type { Me } from '../../api/types';

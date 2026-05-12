@@ -59,9 +59,7 @@ def read_session(request: Request) -> SessionUser | None:
     if not token:
         return None
     try:
-        payload = _serializer(settings).loads(
-            token, max_age=settings.session_max_age_seconds
-        )
+        payload = _serializer(settings).loads(token, max_age=settings.session_max_age_seconds)
     except (BadSignature, SignatureExpired):
         return None
     if not isinstance(payload, dict):

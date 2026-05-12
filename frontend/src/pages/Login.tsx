@@ -5,8 +5,7 @@ import { Banner } from '../components/ui/Banner';
 
 export function Login() {
   const location = useLocation();
-  const networkError =
-    (location.state as { networkError?: string } | null)?.networkError ?? null;
+  const networkError = (location.state as { networkError?: string } | null)?.networkError ?? null;
 
   const onLogin = () => {
     window.location.href = '/auth/google/login';
@@ -23,9 +22,7 @@ export function Login() {
             height={58}
           />
           <div>
-            <h1 className="font-display text-xl font-semibold leading-tight">
-              Kratos
-            </h1>
+            <h1 className="font-display text-xl font-semibold leading-tight">Kratos</h1>
             <div className="text-sm text-fg-muted mt-1">Pelea de gallos · Q3 2026</div>
           </div>
         </div>
@@ -40,8 +37,8 @@ export function Login() {
           </Banner>
         )}
         <p className="text-fg-secondary text-sm leading-relaxed">
-          Inicia sesión con tu cuenta corporativa para puntuar las propuestas internas. El
-          voto es anónimo, irreversible y sólo se puede emitir una vez.
+          Inicia sesión con tu cuenta corporativa para puntuar las propuestas internas. El voto es
+          anónimo, irreversible y sólo se puede emitir una vez.
         </p>
         <Button onClick={onLogin} size="lg" className="w-full">
           <svg viewBox="0 0 48 48" className="w-5 h-5" aria-hidden="true">

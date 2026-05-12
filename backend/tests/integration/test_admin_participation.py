@@ -7,9 +7,9 @@ from __future__ import annotations
 
 
 def _seed_proposal_and_open(admin_client) -> int:
-    pid = admin_client.post(
-        "/api/admin/proposals", json={"name": "P", "description": "d"}
-    ).json()["id"]
+    pid = admin_client.post("/api/admin/proposals", json={"name": "P", "description": "d"}).json()[
+        "id"
+    ]
     admin_client.post("/api/admin/period/open")
     return pid
 
@@ -45,15 +45,11 @@ def test_participation_lists_voters_desc(admin_client):
 def test_quorum_set_and_clear(admin_client):
     _seed_proposal_and_open(admin_client)
     # Set 48
-    r = admin_client.patch(
-        "/api/admin/period/quorum", json={"expected_quorum": 48}
-    )
+    r = admin_client.patch("/api/admin/period/quorum", json={"expected_quorum": 48})
     assert r.status_code == 204
     assert admin_client.get("/api/admin/participation").json()["expected_quorum"] == 48
     # Clear con null
-    r = admin_client.patch(
-        "/api/admin/period/quorum", json={"expected_quorum": None}
-    )
+    r = admin_client.patch("/api/admin/period/quorum", json={"expected_quorum": None})
     assert r.status_code == 204
     assert admin_client.get("/api/admin/participation").json()["expected_quorum"] is None
 

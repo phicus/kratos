@@ -11,9 +11,7 @@ def _create(client, name: str) -> int:
 
 def test_bulk_exclude_three_votables(admin_client):
     ids = [_create(admin_client, f"P{i}") for i in range(3)]
-    r = admin_client.post(
-        "/api/admin/proposals/bulk-exclude", json={"proposal_ids": ids}
-    )
+    r = admin_client.post("/api/admin/proposals/bulk-exclude", json={"proposal_ids": ids})
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["affected"] == 3
@@ -42,9 +40,7 @@ def test_bulk_exclude_mixed_with_already_excluded(admin_client):
     # Pre-excluir el primero individualmente
     assert admin_client.post(f"/api/admin/proposals/{ids[0]}/exclude").status_code == 204
 
-    r = admin_client.post(
-        "/api/admin/proposals/bulk-exclude", json={"proposal_ids": ids}
-    )
+    r = admin_client.post("/api/admin/proposals/bulk-exclude", json={"proposal_ids": ids})
     body = r.json()
     assert body["affected"] == 2
     assert len(body["skipped"]) == 1
@@ -55,9 +51,7 @@ def test_bulk_exclude_mixed_with_already_excluded(admin_client):
 def test_bulk_restore_inverse(admin_client):
     ids = [_create(admin_client, f"R{i}") for i in range(3)]
     admin_client.post("/api/admin/proposals/bulk-exclude", json={"proposal_ids": ids})
-    r = admin_client.post(
-        "/api/admin/proposals/bulk-restore", json={"proposal_ids": ids}
-    )
+    r = admin_client.post("/api/admin/proposals/bulk-restore", json={"proposal_ids": ids})
     body = r.json()
     assert body["affected"] == 3
     assert body["skipped"] == []
@@ -82,14 +76,10 @@ def test_bulk_rejects_unknown_ids(admin_client):
 def test_bulk_blocked_outside_preparacion(admin_client):
     pid = _create(admin_client, "Solo")
     admin_client.post("/api/admin/period/open")
-    r = admin_client.post(
-        "/api/admin/proposals/bulk-exclude", json={"proposal_ids": [pid]}
-    )
+    r = admin_client.post("/api/admin/proposals/bulk-exclude", json={"proposal_ids": [pid]})
     assert r.status_code == 409
 
 
 def test_bulk_empty_list_422(admin_client):
-    r = admin_client.post(
-        "/api/admin/proposals/bulk-exclude", json={"proposal_ids": []}
-    )
+    r = admin_client.post("/api/admin/proposals/bulk-exclude", json={"proposal_ids": []})
     assert r.status_code == 422

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { admin } from '../../api/endpoints';
 import type { AuditEntry } from '../../api/types';
 

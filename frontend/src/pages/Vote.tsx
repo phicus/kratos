@@ -6,7 +6,7 @@ import { PeriodBanner } from '../components/PeriodBanner';
 import { ProposalCard } from '../components/ProposalCard';
 import { Button } from '../components/ui/Button';
 import { ConfirmModal } from '../components/ui/Modal';
-import { useToast } from '../components/ui/Toast';
+import { useToast } from '../components/ui/useToast';
 import { ApiError } from '../api/client';
 import { getProposals, submitBallot } from '../api/endpoints';
 import type { Me, Proposal } from '../api/types';
@@ -43,9 +43,7 @@ export function Vote({ me }: Props) {
     if (!proposals) return;
     setSubmitting(true);
     try {
-      await submitBallot(
-        proposals.map((p) => ({ proposal_id: p.id, score: scores[p.id] })),
-      );
+      await submitBallot(proposals.map((p) => ({ proposal_id: p.id, score: scores[p.id] })));
       push('success', 'Papeleta registrada de forma anónima');
       navigate('/already-voted');
     } catch (err) {

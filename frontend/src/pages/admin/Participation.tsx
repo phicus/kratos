@@ -4,16 +4,11 @@ import { VotersList } from '../../components/admin/VotersList';
 import { Badge } from '../../components/ui/Badge';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { usePeriod } from '../../hooks/usePeriod';
 import { useParticipation } from '../../hooks/useParticipation';
 import { admin } from '../../api/endpoints';
-import {
-  IconChevronLeft,
-  IconClock,
-  IconLock,
-  IconPlay,
-} from '../../components/admin/iconMap';
+import { IconChevronLeft, IconClock, IconLock, IconPlay } from '../../components/admin/iconMap';
 
 export function Participation() {
   const navigate = useNavigate();
@@ -57,9 +52,7 @@ export function Participation() {
   };
 
   const remaining =
-    data && data.expected_quorum
-      ? Math.max(0, data.expected_quorum - data.voters_count)
-      : null;
+    data && data.expected_quorum ? Math.max(0, data.expected_quorum - data.voters_count) : null;
 
   return (
     <div className="space-y-5">

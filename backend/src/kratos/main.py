@@ -42,7 +42,7 @@ def create_app() -> FastAPI:
     )
 
     # Routers
-    from .api import (  # noqa: WPS433 — import diferido para evitar ciclos
+    from .api import (
         admin_audit,
         admin_dashboard,
         admin_participation,
@@ -77,7 +77,7 @@ def create_app() -> FastAPI:
         )
 
         @app.get("/{full_path:path}", include_in_schema=False)
-        async def spa_fallback(full_path: str, request: Request):  # noqa: ARG001
+        async def spa_fallback(full_path: str, request: Request):
             if full_path.startswith(("api/", "auth/")):
                 return JSONResponse({"detail": "Not Found"}, status_code=404)
             file_path = STATIC_DIR / full_path

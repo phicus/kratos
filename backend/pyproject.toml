@@ -40,7 +40,13 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "RUF"]
-ignore = ["E501"]
+ignore = [
+    "E501",  # line-length: black ya lo controla
+    "B008",  # falsos positivos sobre el patrón FastAPI `Depends(...)` en defaults
+    "RUF001",  # ambigüedad U+00A0/etc en strings es legítima en copys en español
+    "RUF002",  # idem en docstrings
+    "RUF003",  # idem en comments
+]
 
 [tool.black]
 line-length = 100

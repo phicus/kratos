@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 
@@ -24,7 +24,7 @@ PERIOD_ID = period_mod.PERIOD_ID
 
 def _truncate_to_minute() -> str:
     """Timestamp UTC ISO con segundos=00 (Principio I: sin alta resolución)."""
-    now = datetime.now(timezone.utc).replace(second=0, microsecond=0)
+    now = datetime.now(UTC).replace(second=0, microsecond=0)
     # Formato sin tz suffix para coincidir con datetime('now') de SQLite
     return now.strftime("%Y-%m-%d %H:%M:00")
 

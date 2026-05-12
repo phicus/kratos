@@ -31,9 +31,7 @@ def get_period(conn: sqlite3.Connection) -> dict:
     ).fetchone()
     if row is None:
         # Defensive: la migración inserta la fila; si falta, repoblar.
-        conn.execute(
-            "INSERT INTO periods(id, state) VALUES (?, 'preparacion')", (PERIOD_ID,)
-        )
+        conn.execute("INSERT INTO periods(id, state) VALUES (?, 'preparacion')", (PERIOD_ID,))
         return {
             "state": "preparacion",
             "opened_at": None,

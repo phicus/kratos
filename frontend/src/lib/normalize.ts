@@ -1,6 +1,9 @@
 /** Normaliza una cadena: lowercase + sin acentos. Para búsqueda Unicode-friendly. */
 export function normalize(s: string): string {
-  return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  return s
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
 }
 
 /** True si `haystack` contiene `needle` (ambos normalizados). */

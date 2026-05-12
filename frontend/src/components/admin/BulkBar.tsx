@@ -1,10 +1,5 @@
 import { Button } from '../ui/Button';
-import {
-  IconCheck,
-  IconEyeOff,
-  IconRefresh,
-  IconXCircle,
-} from './iconMap';
+import { IconCheck, IconEyeOff, IconRefresh, IconXCircle } from './iconMap';
 
 interface Props {
   count: number;

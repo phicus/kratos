@@ -74,12 +74,7 @@ export function ActionCardContextual({ state, onAction }: Props) {
         {items.map((it) => {
           const Icon = it.icon;
           return (
-            <Button
-              key={it.id}
-              variant={it.variant}
-              size="md"
-              onClick={() => onAction(it.id)}
-            >
+            <Button key={it.id} variant={it.variant} size="md" onClick={() => onAction(it.id)}>
               <Icon size={16} />
               {it.label}
             </Button>

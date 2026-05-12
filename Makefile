@@ -21,9 +21,12 @@ NPM ?= npm
 
 .PHONY: help dev install install-backend install-frontend init seed \
         backend frontend backend-bg frontend-bg \
-        test test-backend test-frontend \
+        test test-backend test-mandatory test-frontend test-e2e \
         build build-frontend lint typecheck \
         docker-build docker-up docker-down \
+        ci ci-backend ci-backend-lint ci-backend-tests \
+        ci-frontend ci-frontend-typecheck ci-frontend-lint ci-frontend-tests ci-frontend-build \
+        format \
         clean clean-db distclean stop
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -151,3 +154,73 @@ clean-db: ## ⚠ Borra la DB local (data/voting.db)
 distclean: clean clean-db ## Limpieza total: build + DB + venv + node_modules
 	@rm -rf $(VENV)
 	@rm -rf $(FRONTEND_DIR)/node_modules
+
+# ─── CI matrix (paridad con .github/workflows/ci.yml) ───────────────────────
+#
+# Estos targets reproducen EXACTAMENTE los comandos del workflow remoto,
+# para que `make ci` en local == GitHub Actions sobre el mismo commit.
+# Las env vars dummy también son idénticas a las del yaml.
+
+CI_ENV := ENV=test \
+          SESSION_SECRET=ci-dummy-secret-not-for-production \
+          GOOGLE_CLIENT_ID=ci-dummy-client-id \
+          GOOGLE_CLIENT_SECRET=ci-dummy-secret \
+          ADMIN_EMAILS=jgomez@phicus.es,epastor@phicus.es \
+          BASE_URL=http://localhost:5173
+
+ci: install ## Ejecuta TODA la matriz CI en local (paridad con GitHub Actions)
+	@bk_status=0; fe_status=0; \
+	$(MAKE) --no-print-directory ci-backend || bk_status=$$?; \
+	$(MAKE) --no-print-directory ci-frontend || fe_status=$$?; \
+	echo "─── CI summary ─────────────────────────────────────────"; \
+	if [ $$bk_status -eq 0 ]; then echo "✓ backend";  else echo "✗ backend  (exit $$bk_status)"; fi; \
+	if [ $$fe_status -eq 0 ]; then echo "✓ frontend"; else echo "✗ frontend (exit $$fe_status)"; fi; \
+	echo "─────────────────────────────────────────────────────────"; \
+	test $$bk_status -eq 0 -a $$fe_status -eq 0
+
+ci-backend: install-backend ## Job `backend` del workflow en local
+	@bl=0; bt=0; \
+	$(MAKE) --no-print-directory ci-backend-lint  || bl=$$?; \
+	$(MAKE) --no-print-directory ci-backend-tests || bt=$$?; \
+	test $$bl -eq 0 -a $$bt -eq 0
+
+ci-backend-lint: install-backend ## ruff check + black --check
+	@echo "→ backend lint (ruff + black)"
+	@cd $(BACKEND_DIR) && $(CURDIR)/$(VENV)/bin/ruff check src tests \
+	  && $(CURDIR)/$(VENV)/bin/black --check src tests
+
+ci-backend-tests: install-backend ## pytest backend (con --junitxml si JUNIT=1)
+	@echo "→ backend tests (pytest)"
+	@cd $(BACKEND_DIR) && $(CI_ENV) $(CURDIR)/$(PYTEST) tests \
+	  $(if $(JUNIT),--junitxml=backend-junit.xml,) -q
+
+ci-frontend: install-frontend ## Job `frontend` del workflow en local
+	@tc=0; fl=0; ft=0; fb=0; \
+	$(MAKE) --no-print-directory ci-frontend-typecheck || tc=$$?; \
+	$(MAKE) --no-print-directory ci-frontend-lint      || fl=$$?; \
+	$(MAKE) --no-print-directory ci-frontend-tests     || ft=$$?; \
+	$(MAKE) --no-print-directory ci-frontend-build     || fb=$$?; \
+	test $$tc -eq 0 -a $$fl -eq 0 -a $$ft -eq 0 -a $$fb -eq 0
+
+ci-frontend-typecheck: install-frontend ## tsc --noEmit
+	@echo "→ frontend typecheck (tsc)"
+	@cd $(FRONTEND_DIR) && $(NPM) run typecheck
+
+ci-frontend-lint: install-frontend ## eslint + prettier --check
+	@echo "→ frontend lint (eslint + prettier)"
+	@cd $(FRONTEND_DIR) && $(NPM) run lint:check
+
+ci-frontend-tests: install-frontend ## vitest run
+	@echo "→ frontend tests (vitest)"
+	@cd $(FRONTEND_DIR) && $(NPM) run test
+
+ci-frontend-build: install-frontend ## vite build
+	@echo "→ frontend build (vite)"
+	@cd $(FRONTEND_DIR) && $(NPM) run build
+
+format: install ## Auto-formatea backend (ruff --fix + black) y frontend (eslint --fix + prettier --write)
+	@echo "→ formateando backend"
+	@cd $(BACKEND_DIR) && $(CURDIR)/$(VENV)/bin/ruff check --fix src tests \
+	  && $(CURDIR)/$(VENV)/bin/black src tests
+	@echo "→ formateando frontend"
+	@cd $(FRONTEND_DIR) && $(NPM) run format

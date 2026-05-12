@@ -20,7 +20,7 @@ from __future__ import annotations
 import re
 
 from kratos.db import connection
-from kratos.models import ballot, proposal
+from kratos.models import ballot
 
 
 def test_vote_scores_schema_has_no_user_columns(init_db):
@@ -28,12 +28,10 @@ def test_vote_scores_schema_has_no_user_columns(init_db):
     with connection() as conn:
         cols = [r["name"] for r in conn.execute("PRAGMA table_info('vote_scores')")]
     forbidden_substrings = ("user", "email", "ip", "agent", "name")
-    offenders = [
-        c for c in cols if any(s in c.lower() for s in forbidden_substrings)
-    ]
-    assert offenders == [], (
-        f"vote_scores tiene columnas correlacionables con el votante: {offenders}"
-    )
+    offenders = [c for c in cols if any(s in c.lower() for s in forbidden_substrings)]
+    assert (
+        offenders == []
+    ), f"vote_scores tiene columnas correlacionables con el votante: {offenders}"
 
 
 def test_vote_receipts_and_scores_share_no_correlation_column(init_db):
@@ -43,9 +41,10 @@ def test_vote_receipts_and_scores_share_no_correlation_column(init_db):
         scores_cols = {r["name"] for r in conn.execute("PRAGMA table_info('vote_scores')")}
     shared = receipts_cols & scores_cols
     # Sólo `period_id` puede compartirse (constante para todas las papeletas).
-    assert shared <= {"period_id", "id"}, (
-        f"vote_receipts y vote_scores comparten columnas inesperadas: {shared}"
-    )
+    assert shared <= {
+        "period_id",
+        "id",
+    }, f"vote_receipts y vote_scores comparten columnas inesperadas: {shared}"
 
 
 def test_no_voter_identity_leaks_into_persisted_scores(init_db, open_period):
@@ -76,9 +75,9 @@ def test_no_voter_identity_leaks_into_persisted_scores(init_db, open_period):
         for col in ("ballot_uuid",):
             val = r[col]
             assert isinstance(val, str)
-            assert not pattern.search(val), (
-                f"vote_scores.{col} contiene marca correlacionable con votante: {val!r}"
-            )
+            assert not pattern.search(
+                val
+            ), f"vote_scores.{col} contiene marca correlacionable con votante: {val!r}"
         ballot_uuids_seen.add(r["ballot_uuid"])
 
     # ballot_uuid no debe aparecer en ninguna otra tabla — comprobamos en vote_receipts.
@@ -89,9 +88,9 @@ def test_no_voter_identity_leaks_into_persisted_scores(init_db, open_period):
                 row = conn.execute(
                     f"SELECT 1 FROM vote_receipts WHERE {col} = ?", (uuid_val,)
                 ).fetchone()
-                assert row is None, (
-                    f"ballot_uuid {uuid_val} aparece en vote_receipts.{col} — viola Principio I"
-                )
+                assert (
+                    row is None
+                ), f"ballot_uuid {uuid_val} aparece en vote_receipts.{col} — viola Principio I"
 
 
 def test_voted_at_truncates_seconds(init_db, open_period):
@@ -104,7 +103,9 @@ def test_voted_at_truncates_seconds(init_db, open_period):
         pid = int(cur.lastrowid)
         open_period(conn)
         ballot.submit(conn, user_email="u@phicus.es", scores={pid: 5})
-        row = conn.execute("SELECT voted_at FROM vote_receipts WHERE user_email='u@phicus.es'").fetchone()
+        row = conn.execute(
+            "SELECT voted_at FROM vote_receipts WHERE user_email='u@phicus.es'"
+        ).fetchone()
     voted_at: str = row["voted_at"]
     # Debe acabar en :00 para no permitir correlación temporal de alta resolución.
     assert voted_at.endswith(":00"), f"voted_at={voted_at!r} contiene segundos no-cero"

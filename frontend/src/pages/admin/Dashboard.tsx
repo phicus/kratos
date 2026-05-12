@@ -5,7 +5,7 @@ import { ActionCardContextual, type ActionId } from '../../components/admin/Acti
 import { MetricCard } from '../../components/admin/MetricCard';
 import { RecentAuditList } from '../../components/admin/RecentAuditList';
 import { Button } from '../../components/ui/Button';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import {
   IconChevronRight,
@@ -115,11 +115,7 @@ export function Dashboard() {
         <div className="adm-hero-cta flex flex-col items-end gap-2">
           <span className="adm-hero-tag">{hero.tag}</span>
           {state === 'abierto' && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate('/admin/participation')}
-            >
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/participation')}>
               Ver participación
               <IconChevronRight size={14} />
             </Button>

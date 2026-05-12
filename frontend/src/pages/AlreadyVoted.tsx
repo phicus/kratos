@@ -11,8 +11,8 @@ export function AlreadyVoted({ me }: { me?: Me | null }) {
         </div>
         <h1 className="font-display text-2xl font-semibold">Ya has votado</h1>
         <p className="text-fg-secondary max-w-md">
-          Tu papeleta quedó registrada de forma anónima. Los resultados se publicarán cuando
-          cierre el periodo de votación.
+          Tu papeleta quedó registrada de forma anónima. Los resultados se publicarán cuando cierre
+          el periodo de votación.
         </p>
       </div>
     </AppShell>

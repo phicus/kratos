@@ -1,10 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Button } from '../ui/Button';
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconShield,
-} from './iconMap';
+import { IconChevronLeft, IconChevronRight, IconShield } from './iconMap';
 import type { VoterReceiptSummary } from '../../api/types';
 
 const PAGE_SIZE = 50;

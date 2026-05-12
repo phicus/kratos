@@ -41,7 +41,9 @@ export function AppShell({ children, me }: Props) {
                 to="/admin"
                 className={({ isActive }) =>
                   `inline-flex items-center gap-1 px-3 py-1.5 rounded-control text-sm font-medium ${
-                    isActive ? 'bg-primary-soft text-primary-soft-text' : 'text-fg-secondary hover:bg-surface-sunken'
+                    isActive
+                      ? 'bg-primary-soft text-primary-soft-text'
+                      : 'text-fg-secondary hover:bg-surface-sunken'
                   }`
                 }
               >
@@ -51,9 +53,7 @@ export function AppShell({ children, me }: Props) {
             )}
             {me ? (
               <>
-                <span className="text-sm text-fg-muted hidden sm:inline pl-2 pr-1">
-                  {me.email}
-                </span>
+                <span className="text-sm text-fg-muted hidden sm:inline pl-2 pr-1">{me.email}</span>
                 <Button variant="ghost" size="sm" onClick={onLogout} aria-label="Cerrar sesión">
                   <LogOut className="w-4 h-4" />
                 </Button>

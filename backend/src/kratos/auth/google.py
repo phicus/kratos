@@ -53,4 +53,4 @@ def validate_phicus_identity(claims: dict) -> tuple[bool, str]:
     return True, email
 
 
-__all__ = ["get_oauth", "validate_phicus_identity", "OAuthError", "PHICUS_DOMAIN"]
+__all__ = ["PHICUS_DOMAIN", "OAuthError", "get_oauth", "validate_phicus_identity"]

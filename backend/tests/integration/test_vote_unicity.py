@@ -48,10 +48,10 @@ def test_concurrent_double_votes_yield_exactly_one_receipt(setup):
     scores_template = {pid: 7 for pid in ids}
     email = "race@phicus.es"
 
-    THREADS = 100
+    threads_count = 100
     successes: list[bool] = []
     errors: list[Exception] = []
-    barrier = threading.Barrier(THREADS)
+    barrier = threading.Barrier(threads_count)
 
     def worker():
         try:
@@ -59,10 +59,10 @@ def test_concurrent_double_votes_yield_exactly_one_receipt(setup):
             with connection() as conn:
                 ballot.submit(conn, user_email=email, scores=dict(scores_template))
             successes.append(True)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             errors.append(exc)
 
-    threads = [threading.Thread(target=worker) for _ in range(THREADS)]
+    threads = [threading.Thread(target=worker) for _ in range(threads_count)]
     for t in threads:
         t.start()
     for t in threads:
@@ -73,15 +73,13 @@ def test_concurrent_double_votes_yield_exactly_one_receipt(setup):
         receipts = conn.execute(
             "SELECT COUNT(*) AS c FROM vote_receipts WHERE user_email=?", (email,)
         ).fetchone()["c"]
-        scores_rows = conn.execute(
-            "SELECT COUNT(*) AS c FROM vote_scores"
-        ).fetchone()["c"]
+        scores_rows = conn.execute("SELECT COUNT(*) AS c FROM vote_scores").fetchone()["c"]
     assert receipts == 1, f"Esperado 1 receipt, encontrados {receipts}"
     assert scores_rows == len(ids), (
         f"Esperado {len(ids)} scores (1 papeleta), encontrados {scores_rows} — "
         "indica que múltiples papeletas se persistieron parcialmente"
     )
     assert len(successes) == 1, (
-        f"Esperado 1 éxito ({len(successes)} encontrados) y {THREADS - 1} fallos "
+        f"Esperado 1 éxito ({len(successes)} encontrados) y {threads_count - 1} fallos "
         f"({len(errors)} errores)"
     )

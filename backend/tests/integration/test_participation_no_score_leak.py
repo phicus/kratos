@@ -25,15 +25,13 @@ def _seed_open_with_votes(admin_client):
     from kratos.db import connection
     from kratos.models import ballot
 
-    pid = admin_client.post(
-        "/api/admin/proposals", json={"name": "P", "description": "d"}
-    ).json()["id"]
+    pid = admin_client.post("/api/admin/proposals", json={"name": "P", "description": "d"}).json()[
+        "id"
+    ]
     admin_client.post("/api/admin/period/open")
     with connection() as conn:
         for i in range(5):
-            ballot.submit(
-                conn, user_email=f"user{i}@phicus.es", scores={pid: (i % 10) + 1}
-            )
+            ballot.submit(conn, user_email=f"user{i}@phicus.es", scores={pid: (i % 10) + 1})
     return pid
 
 
@@ -56,9 +54,9 @@ def test_response_payload_has_no_score_keys(admin_client):
     _seed_open_with_votes(admin_client)
     data = admin_client.get("/api/admin/participation").json()
     leaked = [k for k in _walk_keys(data) if FORBIDDEN_KEYS.search(k)]
-    assert leaked == [], (
-        f"El response de /api/admin/participation contiene claves prohibidas: {leaked}"
-    )
+    assert (
+        leaked == []
+    ), f"El response de /api/admin/participation contiene claves prohibidas: {leaked}"
 
 
 # ─── Invariante 2: AST estático del módulo del endpoint ─────────────────────
@@ -68,11 +66,7 @@ FORBIDDEN_IMPORTS = {"vote_scores", "results", "ballot"}
 
 def test_admin_participation_module_has_no_forbidden_imports():
     src = (
-        Path(__file__).resolve().parents[2]
-        / "src"
-        / "kratos"
-        / "api"
-        / "admin_participation.py"
+        Path(__file__).resolve().parents[2] / "src" / "kratos" / "api" / "admin_participation.py"
     ).read_text(encoding="utf-8")
     tree = ast.parse(src)
     offenders: list[str] = []
@@ -87,9 +81,9 @@ def test_admin_participation_module_has_no_forbidden_imports():
             for name in node.names:
                 if any(part in FORBIDDEN_IMPORTS for part in name.name.split(".")):
                     offenders.append(f"import {name.name}")
-    assert offenders == [], (
-        f"admin_participation.py importa módulos prohibidos por Principio I: {offenders}"
-    )
+    assert (
+        offenders == []
+    ), f"admin_participation.py importa módulos prohibidos por Principio I: {offenders}"
 
 
 # ─── Invariante 3: trace de SQL durante la llamada al endpoint ──────────────
@@ -143,10 +137,8 @@ def test_endpoint_does_not_query_vote_scores(admin_client, monkeypatch):
     assert r.status_code == 200
 
     offenders = [sql for sql in captured if "vote_scores" in sql.lower()]
-    assert offenders == [], (
-        f"/api/admin/participation ejecutó SQL contra vote_scores: {offenders}"
-    )
+    assert offenders == [], f"/api/admin/participation ejecutó SQL contra vote_scores: {offenders}"
     # Sanity: alguna query sobre vote_receipts SÍ debe aparecer.
-    assert any("vote_receipts" in sql.lower() for sql in captured), (
-        "El test no ha capturado ninguna query — el monkeypatch no funcionó."
-    )
+    assert any(
+        "vote_receipts" in sql.lower() for sql in captured
+    ), "El test no ha capturado ninguna query — el monkeypatch no funcionó."

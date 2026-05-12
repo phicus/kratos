@@ -24,14 +24,9 @@ export function RankingRow({ entry, rank, maxScore }: Props) {
         #{rank}
       </div>
       <div className="flex-1 min-w-0">
-        <div className={`font-medium ${isTop ? 'text-fg' : 'text-fg-secondary'}`}>
-          {entry.name}
-        </div>
+        <div className={`font-medium ${isTop ? 'text-fg' : 'text-fg-secondary'}`}>{entry.name}</div>
         <div className="mt-1 h-1.5 bg-surface-sunken rounded-pill overflow-hidden" aria-hidden>
-          <div
-            className="h-full bg-primary/60 rounded-pill"
-            style={{ width: `${pct}%` }}
-          />
+          <div className="h-full bg-primary/60 rounded-pill" style={{ width: `${pct}%` }} />
         </div>
       </div>
       <div className="shrink-0 text-right">

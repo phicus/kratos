@@ -1,8 +1,14 @@
 # Kratos
 
+[![CI](https://github.com/phicus/kratos/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/phicus/kratos/actions/workflows/ci.yml)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)](./CONTRIBUTING.md)
+
 Sistema interno de votación para Phicus. Empleados con cuenta
 `@phicus.es` puntúan propuestas internas de 1 a 10 vía Google Workspace
 SSO. Voto anónimo, único por persona, controlado por dos administradores.
+
+> ⚠️ El badge de CI asume que el repo se aloja en `github.com/phicus/kratos`.
+> Ajusta el path en el `<owner>/<repo>` del URL si difiere.
 
 ## Quickstart
 

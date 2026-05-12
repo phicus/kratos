@@ -19,7 +19,9 @@ export function ProposalCard({ proposal, score, onScore, disabled }: Props) {
     <Card
       emphasized={hasScore}
       className={`relative overflow-hidden ${
-        hasScore ? 'before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary' : ''
+        hasScore
+          ? 'before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary'
+          : ''
       }`}
     >
       <div className="p-4 sm:p-5 flex flex-col gap-3">

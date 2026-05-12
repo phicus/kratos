@@ -11,8 +11,8 @@ export function PeriodNotOpen({ me }: { me?: Me | null }) {
         </div>
         <h1 className="font-display text-2xl font-semibold">Aún no hemos abierto la votación</h1>
         <p className="text-fg-secondary max-w-md">
-          Los administradores siguen revisando las propuestas. Recibirás aviso interno cuando
-          el periodo se abra.
+          Los administradores siguen revisando las propuestas. Recibirás aviso interno cuando el
+          periodo se abra.
         </p>
       </div>
     </AppShell>

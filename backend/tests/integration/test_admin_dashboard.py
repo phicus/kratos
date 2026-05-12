@@ -26,9 +26,7 @@ def test_dashboard_preparacion_empty(admin_client):
 def test_dashboard_with_proposals_and_open_period(admin_client):
     # Seed
     for name in ("Alpha", "Beta", "Gamma"):
-        r = admin_client.post(
-            "/api/admin/proposals", json={"name": name, "description": "d"}
-        )
+        r = admin_client.post("/api/admin/proposals", json={"name": name, "description": "d"})
         assert r.status_code == 201
 
     # Open
@@ -50,9 +48,9 @@ def test_dashboard_ballots_cast_increases_on_vote(admin_client):
     from kratos.db import connection
     from kratos.models import ballot
 
-    pid = admin_client.post(
-        "/api/admin/proposals", json={"name": "X", "description": "d"}
-    ).json()["id"]
+    pid = admin_client.post("/api/admin/proposals", json={"name": "X", "description": "d"}).json()[
+        "id"
+    ]
     admin_client.post("/api/admin/period/open")
 
     with connection() as conn:

@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Plus, Edit2, EyeOff, Eye, Upload } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Input, Label, Textarea } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { BulkBar } from '../../components/admin/BulkBar';
 import { ProposalsSearch } from '../../components/admin/ProposalsSearch';
 import { useBulkSelection } from '../../hooks/useBulkSelection';
@@ -39,17 +39,17 @@ export function AdminProposals() {
   const isPreparacion = period?.state === 'preparacion';
   const checkboxesVisible = isPreparacion;
 
-  const reload = async () => {
+  const reload = useCallback(async () => {
     try {
       setProposals(await getProposals());
     } catch (err) {
       push('error', err instanceof Error ? err.message : String(err));
     }
-  };
+  }, [push]);
 
   useEffect(() => {
     void reload();
-  }, []);
+  }, [reload]);
 
   const visible = useMemo(
     () =>
@@ -169,7 +169,9 @@ export function AdminProposals() {
                 if (el) el.indeterminate = !allChecked && someChecked;
               }}
               onChange={() => bulk.toggleAll(visible)}
-              aria-label={allChecked ? 'Deseleccionar todas las visibles' : 'Seleccionar todas las visibles'}
+              aria-label={
+                allChecked ? 'Deseleccionar todas las visibles' : 'Seleccionar todas las visibles'
+              }
             />
           </span>
           Seleccionar las {visible.length} visibles
@@ -179,9 +181,7 @@ export function AdminProposals() {
       <div className="space-y-2">
         {visible.length === 0 ? (
           <p className="text-fg-muted py-8 text-center">
-            {query
-              ? `Sin coincidencias para "${query}".`
-              : 'Sin propuestas en este filtro.'}
+            {query ? `Sin coincidencias para "${query}".` : 'Sin propuestas en este filtro.'}
           </p>
         ) : (
           visible.map((p) => {
@@ -412,11 +412,19 @@ function FormFields({ form, setForm }: { form: FormState; setForm: (f: FormState
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="name" required>Nombre</Label>
-        <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <Label htmlFor="name" required>
+          Nombre
+        </Label>
+        <Input
+          id="name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
       </div>
       <div>
-        <Label htmlFor="description" required>Descripción</Label>
+        <Label htmlFor="description" required>
+          Descripción
+        </Label>
         <Textarea
           id="description"
           rows={3}
@@ -481,8 +489,8 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     >
       <div className="space-y-3">
         <p className="text-sm text-fg-secondary">
-          Sube el CSV exportado del formulario de Google. La importación es idempotente:
-          re-importar no crea duplicados.
+          Sube el CSV exportado del formulario de Google. La importación es idempotente: re-importar
+          no crea duplicados.
         </p>
         <Input
           type="file"

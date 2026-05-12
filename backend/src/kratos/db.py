@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import sqlite3
 import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
 
 from .config import get_settings
 
@@ -48,7 +48,9 @@ def connection() -> Iterator[sqlite3.Connection]:
 
 
 @contextmanager
-def transaction(conn: sqlite3.Connection, *, immediate: bool = True) -> Iterator[sqlite3.Connection]:
+def transaction(
+    conn: sqlite3.Connection, *, immediate: bool = True
+) -> Iterator[sqlite3.Connection]:
     """Transacción explícita. `immediate=True` adquiere lock RESERVED inmediato.
 
     Necesario en `POST /api/ballot` para serializar dobles votos del mismo
@@ -66,14 +68,12 @@ def transaction(conn: sqlite3.Connection, *, immediate: bool = True) -> Iterator
 def init_db() -> None:
     """Aplica migraciones idempotentemente. Llamable con `python -m kratos.db init`."""
     with connection() as conn:
-        conn.execute(
-            """
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS schema_migrations (
                 version TEXT PRIMARY KEY,
                 applied_at TEXT NOT NULL DEFAULT (datetime('now'))
             )
-            """
-        )
+            """)
         applied = {row["version"] for row in conn.execute("SELECT version FROM schema_migrations")}
         for sql_file in sorted(MIGRATIONS_DIR.glob("*.sql")):
             version = sql_file.stem

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GitMerge } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Input, Label, Textarea } from '../../components/ui/Input';
-import { useToast } from '../../components/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { admin, getProposals } from '../../api/endpoints';
 import type { Proposal } from '../../api/types';
 
@@ -14,17 +14,17 @@ export function AdminMerge() {
   const [form, setForm] = useState({ name: '', description: '', how: '', time_estimate: '' });
   const [saving, setSaving] = useState(false);
 
-  const reload = async () => {
+  const reload = useCallback(async () => {
     try {
       const list = await getProposals();
       setProposals(list.filter((p) => p.status === 'votable'));
     } catch (err) {
       push('error', err instanceof Error ? err.message : String(err));
     }
-  };
+  }, [push]);
   useEffect(() => {
     void reload();
-  }, []);
+  }, [reload]);
 
   const toggle = (id: number) => {
     setSelected((prev) => {

@@ -3,7 +3,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { AppShell } from '../components/AppShell';
 import { Button } from '../components/ui/Button';
 import { RankingRow } from '../components/RankingRow';
-import { useToast } from '../components/ui/Toast';
+import { useToast } from '../components/ui/useToast';
 import { admin, getResults } from '../api/endpoints';
 import type { Me, Ranking } from '../api/types';
 
