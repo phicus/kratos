@@ -1,0 +1,472 @@
+openapi: 3.1.0
+info:
+  title: Kratos API
+  version: 0.1.0
+  description: |
+    Contrato HTTP del backend FastAPI. Toda la API está protegida por sesión
+    (cookie firmada HTTP-only) excepto los endpoints de `/auth/google/*`.
+    Las respuestas de error siguen el formato `{ "detail": "<mensaje>" }` de
+    FastAPI por defecto, salvo el caso explícito de "ya votó" que añade
+    `code: "ALREADY_VOTED"`.
+
+servers:
+  - url: https://kratos.phicus.es
+    description: Producción
+  - url: http://localhost:8000
+    description: Local dev
+
+tags:
+  - name: auth
+  - name: me
+  - name: proposals
+  - name: period
+  - name: ballot
+  - name: results
+  - name: admin
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: phicus_session
+
+  schemas:
+    Me:
+      type: object
+      required: [email, is_admin, has_voted, period_state]
+      properties:
+        email:      { type: string, format: email }
+        is_admin:   { type: boolean }
+        has_voted:  { type: boolean }
+        period_state: { $ref: '#/components/schemas/PeriodState' }
+
+    PeriodState:
+      type: string
+      enum: [preparacion, abierto, cerrado]
+
+    Period:
+      type: object
+      required: [state]
+      properties:
+        state:      { $ref: '#/components/schemas/PeriodState' }
+        opened_at:  { type: string, format: date-time, nullable: true }
+        closed_at:  { type: string, format: date-time, nullable: true }
+
+    ProposalStatus:
+      type: string
+      enum: [votable, excluded, merged_parent]
+
+    Proposal:
+      type: object
+      required: [id, name, description, status]
+      properties:
+        id:                       { type: integer }
+        name:                     { type: string, maxLength: 200 }
+        description:              { type: string }
+        how:                      { type: string, nullable: true }
+        time_estimate:            { type: string, nullable: true }
+        original_author_email:    { type: string, nullable: true, description: "Solo visible para admins." }
+        status:                   { $ref: '#/components/schemas/ProposalStatus' }
+        parent_ids:               { type: array, items: { type: integer }, description: "IDs de propuestas padre si esta es resultado de un merge." }
+
+    ProposalEdit:
+      type: object
+      properties:
+        name:          { type: string, maxLength: 200 }
+        description:   { type: string }
+        how:           { type: string, nullable: true }
+        time_estimate: { type: string, nullable: true }
+
+    ProposalMergeRequest:
+      type: object
+      required: [parent_ids, name, description]
+      properties:
+        parent_ids:    { type: array, items: { type: integer }, minItems: 2 }
+        name:          { type: string, maxLength: 200 }
+        description:   { type: string }
+        how:           { type: string, nullable: true }
+        time_estimate: { type: string, nullable: true }
+
+    BallotItem:
+      type: object
+      required: [proposal_id, score]
+      properties:
+        proposal_id: { type: integer }
+        score:       { type: integer, minimum: 1, maximum: 10 }
+
+    BallotRequest:
+      type: object
+      required: [scores]
+      properties:
+        scores:
+          type: array
+          items: { $ref: '#/components/schemas/BallotItem' }
+          minItems: 1
+          description: |
+            Debe contener una entrada por CADA propuesta con `status='votable'`
+            en el momento de la emisión; el servidor valida cobertura antes
+            de aceptar.
+
+    RankingEntry:
+      type: object
+      required: [proposal_id, name, total_score]
+      properties:
+        proposal_id: { type: integer }
+        name:        { type: string }
+        total_score: { type: integer, minimum: 0 }
+        vote_count:  { type: integer, minimum: 0, description: "Número de papeletas que la puntuaron (= total votantes si periodo cerrado)." }
+
+    Ranking:
+      type: object
+      required: [period_state, entries]
+      properties:
+        period_state: { $ref: '#/components/schemas/PeriodState' }
+        closed_at:    { type: string, format: date-time, nullable: true }
+        entries:
+          type: array
+          items: { $ref: '#/components/schemas/RankingEntry' }
+
+    AuditEntry:
+      type: object
+      required: [admin_email, action, occurred_at]
+      properties:
+        admin_email:          { type: string, format: email }
+        action:               { type: string }
+        target_ids:           { type: array, items: { type: integer }, nullable: true }
+        period_state_before:  { $ref: '#/components/schemas/PeriodState' }
+        period_state_after:   { $ref: '#/components/schemas/PeriodState' }
+        details:              { type: object, additionalProperties: true, nullable: true }
+        occurred_at:          { type: string, format: date-time }
+
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail: { type: string }
+        code:   { type: string, nullable: true }
+
+security:
+  - sessionCookie: []
+
+paths:
+  /auth/google/login:
+    get:
+      tags: [auth]
+      summary: Inicia el flujo OAuth contra Google
+      security: []
+      responses:
+        '302':
+          description: Redirección al endpoint de autorización de Google.
+
+  /auth/google/callback:
+    get:
+      tags: [auth]
+      summary: Callback OIDC
+      security: []
+      description: |
+        Valida el `id_token`, exige `claims.hd == "phicus.es"` y
+        `claims.email.lower().endswith("@phicus.es")`. Si pasa, crea
+        cookie de sesión y redirige a `/`. Si falla, devuelve 403.
+      parameters:
+        - in: query
+          name: code
+          schema: { type: string }
+          required: true
+      responses:
+        '302': { description: Sesión creada, redirige a `/`. }
+        '403':
+          description: Identidad rechazada (dominio no autorizado).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Borra la sesión
+      responses:
+        '204': { description: Sesión eliminada. }
+
+  /api/me:
+    get:
+      tags: [me]
+      summary: Identidad del usuario actual + estado de votación
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Me' }
+        '401':
+          description: No autenticado.
+
+  /api/period:
+    get:
+      tags: [period]
+      summary: Estado público del periodo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Period' }
+
+  /api/proposals:
+    get:
+      tags: [proposals]
+      summary: Lista de propuestas votables
+      description: |
+        Devuelve sólo las propuestas con `status='votable'`. Para admins
+        en estado `preparacion`, incluye también `excluded` y
+        `merged_parent` con su flag de estado.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Proposal' }
+        '401': { description: No autenticado. }
+
+  /api/ballot:
+    post:
+      tags: [ballot]
+      summary: Emitir papeleta (anónima, una sola vez)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BallotRequest' }
+      responses:
+        '201':
+          description: Papeleta registrada.
+        '403':
+          description: Periodo no `abierto`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '409':
+          description: |
+            El usuario ya votó. Body incluye `code: "ALREADY_VOTED"`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: |
+            Papeleta inválida: cobertura incompleta de propuestas votables,
+            propuestas inexistentes, scores fuera de rango.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/results:
+    get:
+      tags: [results]
+      summary: Ranking final (sólo con periodo `cerrado`)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ranking' }
+        '409':
+          description: Periodo aún no cerrado.
+
+  /api/results.csv:
+    get:
+      tags: [results, admin]
+      summary: Exporta ranking en CSV
+      description: Sólo administradores. Periodo debe estar `cerrado`.
+      responses:
+        '200':
+          description: CSV con columnas `proposal_id,name,total_score,vote_count`.
+          content:
+            text/csv: {}
+        '403': { description: No admin. }
+        '409': { description: Periodo no cerrado. }
+
+  /api/admin/period/open:
+    post:
+      tags: [admin, period]
+      summary: Transición `preparacion → abierto`
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Estado origen incorrecto. }
+
+  /api/admin/period/close:
+    post:
+      tags: [admin, period]
+      summary: Transición `abierto → cerrado`
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Estado origen incorrecto. }
+
+  /api/admin/period/reset:
+    post:
+      tags: [admin, period]
+      summary: Transición `cerrado → preparacion` (purga ballots+receipts).
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Estado origen incorrecto. }
+
+  /api/admin/proposals:
+    post:
+      tags: [admin, proposals]
+      summary: Crear propuesta nueva (sólo en estado `preparacion`).
+      description: |
+        Permite al administrador crear una propuesta sin pasar por la
+        importación CSV. Audit `PROPOSAL_CREATE`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, description]
+              properties:
+                name:          { type: string, maxLength: 200 }
+                description:   { type: string }
+                how:           { type: string, nullable: true }
+                time_estimate: { type: string, nullable: true }
+      responses:
+        '201':
+          description: Creada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Proposal' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/proposals/{id}:
+    patch:
+      tags: [admin, proposals]
+      summary: Editar propuesta (sólo en estado `preparacion`).
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProposalEdit' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Proposal' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/proposals/{id}/exclude:
+    post:
+      tags: [admin, proposals]
+      summary: Marca como `excluded` (no votable).
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/proposals/{id}/restore:
+    post:
+      tags: [admin, proposals]
+      summary: Restaura propuesta excluida a `votable`.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/proposals/merge:
+    post:
+      tags: [admin, proposals]
+      summary: Fusiona ≥2 propuestas en una nueva propuesta hija.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProposalMergeRequest' }
+      responses:
+        '201':
+          description: Propuesta hija creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Proposal' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion o padres ya fusionados. }
+
+  /api/admin/proposals/{id}/unmerge:
+    post:
+      tags: [admin, proposals]
+      summary: Deshace la fusión, restaura padres como votables.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/audit-log:
+    get:
+      tags: [admin]
+      summary: Devuelve el log administrativo append-only.
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 200, maximum: 1000 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AuditEntry' }
+        '403': { description: No admin. }
+
+  /api/admin/proposals/import:
+    post:
+      tags: [admin, proposals]
+      summary: Importa propuestas desde el CSV de Google Form.
+      description: |
+        Idempotente (match por `name` + `original_author_email`).
+        Sólo en estado `preparacion`.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: Resumen del import.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imported: { type: integer }
+                  skipped:  { type: integer }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }

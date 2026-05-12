@@ -1,0 +1,176 @@
+Marca temporal,Dirección de correo electrónico,¿Cuál sería el nombre de la idea/proyecto?,Describe cual es el objetivo de la idea/proyecto. ¿Qué soluciona o facilita?,¿Sabrías explicar como lo harías? (OPCIONAL),"¿Podrías estimar si se podría hacer en un día o se necesitarían varios? (OPCIONAL, sólo si sabes cómo se haría)",VOTOS
+11/05/2026 10:39:48,asanchez@phicus.es,FeedBack_clientes,Opinión de los clientes respecto al proceso de los servicios prestados.,Formulario con preguntas abiertas y cerradas.,5,
+11/05/2026 11:09:04,rpardines@phicus.es,Toolops,Automatizar y mejorar los tiempos en operaciones,modulos pequeños para todas las necesidades mas usadas,5,
+11/05/2026 11:16:49,amarco@phicus.es,CPE Assist,"Cuando un cliente llama o abre una incidencia en horario de guardia, el sistema primero valida si realmente es una emergencia. Si la incidencia parece estar relacionada con un CPE, router, ONT o equipo de cliente final, se activa un asistente automático que guía al cliente antes de despertar al técnico de guardia.
+
+Funcionamiento básico
+El cliente contacta fuera de horario.
+El sistema pregunta qué tipo de incidencia tiene.
+Si detecta que es un problema de CPE, lanza un diagnóstico guiado.
+El asistente intenta comprobar el estado del equipo.
+Si el problema es simple, da instrucciones al cliente.
+Si es crítico o no se puede resolver, escala al técnico de guardia con toda la información recopilada.
+Ejemplo de flujo
+
+Cliente:
+“No tengo acceso a un router de un abonado.”
+
+Asistente:
+“Vamos a comprobar el estado del CPE antes de escalar la incidencia a guardia.”
+
+Preguntas automáticas:
+
+¿Cuál es el identificador del cliente final?
+¿Cuál es la IP, MAC o número de serie del CPE?
+¿El problema afecta solo a un cliente o a varios?
+¿El CPE responde a ping?
+¿Está registrado en el ACS?
+¿Cuándo fue el último inform del CPE?
+¿Tiene sesión PPPoE/DHCP activa?
+¿Se ha reiniciado recientemente?
+¿Hay cortes en la ONT o pérdida óptica?
+¿Se puede acceder por ACS/TR-069?
+¿Hay puertos de gestión abiertos?
+Diagnóstico automático
+
+El asistente podría comprobar:
+
+Comprobación	Resultado posible
+Ping al CPE	Responde / No responde
+Última conexión ACS	Conectado / Sin inform desde hace X horas
+Estado TR-069	Activo / No disponible
+Sesión PPPoE	Activa / Caída
+IP asignada	Correcta / Sin IP
+Puertos de gestión	Abiertos / Cerrados
+Reinicio remoto	Disponible / No disponible
+Estado ONT	Online / Offline
+Potencia óptica	Correcta / Degradada
+Cliente afectado	Individual / Masivo",,4,
+11/05/2026 11:18:09,smartinez@phicus.es,BOT-PHICUS-OFFLINE,"Tener un asistente para incidencias básicas, donde guíe al cliente a identificar el posible error y acciones de cómo solventar, así como indicar que se está fuera de horario y solo se atienden incidencias graves",,4,
+11/05/2026 11:18:53,amarco@phicus.es,PortGuard,"Crear una herramienta que ayude al técnico a saber si puede acceder remotamente al CPE. O para comprobar un cliente si tiene puertos abiertos a una IP publica
+
+Funciones del asistente
+
+El técnico introduce:
+
+IP pública o privada.
+Modelo del CPE.
+Cliente/operador.
+Tipo de acceso: HTTP, HTTPS, SSH, Telnet, Winbox, SNMP, TR-069.
+Puerto esperado.
+
+Y la herramienta comprueba:
+
+Si el puerto está abierto.
+Si responde el servicio correcto.
+Si hay NAT o firewall bloqueando.
+Si el acceso está permitido por política.
+Si el equipo responde desde la red de gestión.
+Si hay ACLs configuradas.
+
+Ejemplo de resultado:
+
+CPE accesible por HTTPS en puerto 8443.
+SSH cerrado.
+TR-069 activo.
+Acceso permitido solo desde red de gestión.
+Recomendación: entrar vía ACS o VPN interna.
+
+Seguridad
+
+El asistente también podría avisar si detecta:
+
+Telnet abierto.
+HTTP sin cifrado abierto a internet.
+Credenciales por defecto.
+Puertos de gestión expuestos públicamente.
+SNMP abierto con community insegura.",,3,
+11/05/2026 11:20:59,amarco@phicus.es,FirmGuard,"Asistente de firmware
+
+Una herramienta para gestionar versiones recomendadas por modelo.
+
+Funciones:
+
+Ver firmware actual del CPE.
+Compararlo con versión recomendada.
+Indicar si hay bugs conocidos.
+Avisar si una versión está obsoleta.
+Sugerir actualización.
+Bloquear despliegues de versiones problemáticas.
+Registrar histórico de actualizaciones.
+
+Ejemplo:
+
+Este modelo tiene firmware 2.1.0.
+Versión recomendada: 2.1.4.
+Bug conocido: pérdida de conexión ACS tras reinicio.
+Recomendación: actualizar antes de escalar.",,4,
+11/05/2026 12:15:30,epastor@phicus.es,UCI de ONT,Un grupo donde se guardan ONT con problemas por parte del operador y el bot realiza análisis periódicos y genera reportes sobre las acciones acometidas y los resultados para ATC/NOC. Cuando pasa cierto tiempo sin que se den de baja el propio bot los da de baja del grupo UCI.,,,
+11/05/2026 13:01:57,smartinez@phicus.es,Visualizador/Importador de locuciones,"La archiconocida y esperada herramienta en la que se pueda subir una locución a una pbx desde Krill. EL bot de Alejandro es útil, pero no todos los clientes lo usan. Propongo añadir en la edición de las pbx un nuevo item al igual que estan DDI, Groups, etc llamado Locuciones, donde se listen las locuciones existentes con su posición y permita subir nuevas. ",,4,
+11/05/2026 13:28:55,aalmarcha@phicus.es,Fin de semana en el chiringuito,"El objetivo es que la persona que está de guardia, tenga un ayudante virtual (boot) para solicitudes que no son de guardia y así el cliente reduzca sus llamadas y las use exclusivamente para casos de verdadera urgencia","La idea sería crear un boot como por ejemplo tenemos para los backups que puede interactuar con el cliente en horario fuera de soporte (sobre todo en fin de semana), que cuando escriba sepa analizar y filtrar el nivel de urgencia de la petición y si no es algo que sea de afectación servicio, le pueda dar opciones para ayudarle a revisar un posible fallo aislado de cpe y así evitar de que abuse de la confianza para llamar al técnico de guardia. Esto no quita que nos pueda llamar pero si quizás evita algunas llamadas que son innecesarias y encima percibe una ayuda inmediata. Ejemplo: sábado 17:00 habla un cliente de que tiene dos cpes de distintas olts que no les funciona el internet. Bien pues el chatboot directamente intereacciona con él le indica que cosas mirar que verificaciones hacer y una vez pasado ese filtro si es necesario le indica que lo mejor es que llame al técnico de guardia, pero si por el contrario lo solventa con la ayuda recibida, quizás ha evitado que el técnico de guardia tenga que dejar una cervecita bien fresquita a mitad en el chiringuito de confianza",,
+11/05/2026 14:24:35,lnunez@phicus.es,Kode review ,"Analizar diffs automáticamente detectando bugs, race conditions, queries N+1, excepciones demasiado amplias. Checklist de revisión según tipo de cambio",GitHub App que comenta automáticamente en PRs. Análisis estático + LLM sobre el diff. Reglas específicas para Python,,
+11/05/2026 14:26:47,lnunez@phicus.es,Test generator,Generar tests unitarios automáticamente a partir de nuevas funciones en PRs. Detectar funciones sin cobertura. Identificar tests frágiles con mocks obsoletos. Implementar nuevo diseño de testing,Análisis del diff + generación de tests con LLM. Integración con pytest y coverage.py,,
+11/05/2026 15:21:19,aalmarcha@phicus.es,KRILLVision,"El objetivo es tener un panel de control de los equipos de red tipo sketchboard, dude o incluso smattree pero que tengamos acceso vía telnet, ssh, hhtps o cual sea el protocolo que utilicemos en el día a día para acceder al mismo, desde el propio panel, como por ejemplo en dude se puede hacer. ","Plantearía dos formas de hacerlo a nivel de conectividad (a nivel de interfaz gráfica necesitaría algún dev).:
+
+1. Tener acceso a los equipos vía ip pública, en los que tienen ip pública la mayoría ya los tenemos actualmente.
+2. Para los equipos que no tenemos ip pública para acceder, podríamos tener un tunel desde nuestro mikrotik de vpn o desde otro mikrotik pequeño que pudiésemos adquirir al core del cliente y de ahí ya tendríamos conectividad privada.
+
+",,
+11/05/2026 15:45:13,arodriguez@phicus.es,Copiloto de guardia,"El objetivo es crear un asistente de apoyo para las guardias que reduzca la necesidad de estar pendiente constantemente de alertas, chats, etc...
+
+La idea es que el sistema ayude a filtrar ruido, resumir incidencias y priorizar avisos para que la persona de guardia pueda estar haciendo su vida normal y solo tenga que intervenir cuando realmente haya algo importante.
+
+No se trata de sustituir a la persona de guardia, sino de hacer que la guardia sea más inteligente, menos intrusiva y menos dependiente de revisar manualmente información dispersa.","Se podría alimentar al asistente con:
+
+Alertas de Icinga.
+Logs de servicios críticos.
+Runbooks internos.
+Procedimientos habituales.
+Histórico de incidencias.
+Comandos frecuentes de diagnóstico.
+Notas de guardias anteriores.
+
+Cuando llegue una alerta, el asistente podría generar un resumen tipo:
+
+Un ejemplo sería:
+
+Alerta: RabbitMQ no responde en servidor X.
+
+Impacto probable:
+Puede afectar a tareas asíncronas y procesos dependientes de colas.
+
+Gravedad estimada:
+Alta si afecta a producción. Media si es un entorno secundario.
+
+Primeras comprobaciones:
+systemctl status rabbitmq-server
+journalctl -u rabbitmq-server -n 100 --no-pager
+df -h
+free -h
+
+Acciones seguras:
+Revisar estado del servicio y consumo de disco/memoria.
+No reiniciar servicios dependientes sin comprobar antes si hay procesos en curso.
+
+Escalar si:
+El servicio no levanta tras revisión básica.
+Hay impacto en clientes.
+La cola acumula mensajes críticos.",3,
+11/05/2026 15:57:45,imoran.ext@phicus.es,Memento automatico post reinicio de olt,Reduce trabajo manual de soporte. ,,,
+11/05/2026 16:07:11,irojo@phicus.es,dora,mapas de red,"SNMP, MIBs standard",,
+11/05/2026 16:07:17,jmartinez@phicus.es,NetCRM,CRM enfocado a los ISP. Quitamos el problema al cliente de tener que pelearse con su crm para integrarse con nosotros.,,5,
+11/05/2026 16:09:25,irojo@phicus.es,JonNieve,vigilar el muro (pasadas las 7),avisar a la guardia de la noche... solo cuando haga falta,,
+11/05/2026 16:09:54,fferez@phicus.es,"""El mejorador de conocimientos de clientes""","Me gustaría tener una herramienta que ayudase a los clientes a usar MEJOR Krill.
+El problema que soluciona es: Clientes que no saben usar Krill incluso 5 años después de tenerlo instalado.
+","No.
+¿Con un robot pequeño que les aparezca y les hable y les indique cosas de Krill? Tipo helper cuando entras a una web muy grande.",,
+11/05/2026 16:16:45,imoran.ext@phicus.es,Historial Centralizado de Incidencias y Soluciones por Cliente,"Actualmente la información técnica ya existe en herramientas como Slack, GitHub, pero se encuentra distribuida entre múltiples canales y conversaciones. ",,,
+11/05/2026 16:19:36,irojo@phicus.es,triajero,hacer el triaje,,,
+11/05/2026 16:30:53,irojo@phicus.es,KolZen,para un callcenter... uso asistido de KPE,,,
+11/05/2026 16:31:36,jmartinez@phicus.es,Logia,"Recoger los últimos logs de todos los servicios que lleva krill (freeradius, kea, etc...) y pasarlos por la IA donde se analiza:
+
+1. Cómo de crítico es el problema
+2. Cuanto tiempo llevaría solucionarlo
+
+Puede aumentar la velocidad con la que se resuelven las incidencias.",,,
+11/05/2026 17:40:41,asanchez@phicus.es,Automatizar partes mensuales,Aplicar diferentes filtros en función de las condiciones laborales,,,

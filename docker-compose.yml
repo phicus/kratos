@@ -1,0 +1,23 @@
+services:
+  kratos:
+    build: .
+    image: kratos-phicus:latest
+    container_name: kratos
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      ENV: production
+      DB_PATH: /app/backend/data/voting.db
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-jgomez@phicus.es,epastor@phicus.es}
+      BASE_URL: ${BASE_URL:-https://kratos.phicus.es}
+    volumes:
+      - ./data:/app/backend/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/period').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -1,0 +1,263 @@
+openapi: 3.1.0
+info:
+  title: Kratos — Delta Admin Dashboard (feature 002)
+  version: 0.2.0
+  description: |
+    **Sólo el delta sobre `specs/001-voting-system/contracts/openapi.yaml`.**
+    Cuando esta feature se merge, los endpoints aquí descritos se
+    integran en el OpenAPI principal.
+
+    Garantía constitucional crítica (Principio I): NINGÚN endpoint nuevo
+    devuelve, expone, ni cruza datos con `vote_scores` o el contenido
+    de las papeletas. La participación se computa exclusivamente sobre
+    `vote_receipts`.
+
+servers:
+  - url: https://kratos.phicus.es
+  - url: http://localhost:8000
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: phicus_session
+
+  schemas:
+    PeriodState:
+      type: string
+      enum: [preparacion, abierto, cerrado]
+
+    DashboardCounters:
+      type: object
+      required: [votable, excluded, merged_parent, ballots_cast]
+      properties:
+        votable:        { type: integer, minimum: 0 }
+        excluded:       { type: integer, minimum: 0 }
+        merged_parent:  { type: integer, minimum: 0 }
+        ballots_cast:
+          type: integer
+          minimum: 0
+          description: |
+            Número de papeletas emitidas en el periodo actual
+            (= COUNT(*) FROM vote_receipts). Sólo significativo en
+            estados `abierto` y `cerrado`. En `preparacion` siempre 0.
+
+    DashboardPeriod:
+      type: object
+      required: [state]
+      properties:
+        state:           { $ref: '#/components/schemas/PeriodState' }
+        opened_at:       { type: string, format: date-time, nullable: true }
+        closed_at:       { type: string, format: date-time, nullable: true }
+        opened_by:       { type: string, nullable: true }
+        closed_by:       { type: string, nullable: true }
+        expected_quorum: { type: integer, minimum: 1, nullable: true }
+
+    AuditEntryCompact:
+      type: object
+      required: [occurred_at, action, admin_email]
+      properties:
+        occurred_at:    { type: string, format: date-time }
+        action:         { type: string }
+        admin_email:    { type: string, format: email }
+        target_ids:     { type: array, items: { type: integer }, nullable: true }
+        details:        { type: object, additionalProperties: true, nullable: true }
+
+    DashboardData:
+      type: object
+      required: [period, counters, recent_audit]
+      properties:
+        period:        { $ref: '#/components/schemas/DashboardPeriod' }
+        counters:      { $ref: '#/components/schemas/DashboardCounters' }
+        recent_audit:
+          type: array
+          maxItems: 5
+          items: { $ref: '#/components/schemas/AuditEntryCompact' }
+
+    VoterReceiptSummary:
+      type: object
+      required: [email, voted_at]
+      properties:
+        email:     { type: string, format: email }
+        voted_at:  { type: string, format: date-time, description: "Timestamp con precisión de minuto." }
+      description: |
+        **Garantía constitucional (Principio I)**: este objeto NUNCA
+        contendrá referencias a puntuaciones, IDs de propuestas, ni
+        `ballot_uuid`. Es la única forma autorizada en la que un endpoint
+        admin puede emitir la identidad de un votante.
+
+    ParticipationData:
+      type: object
+      required: [voters_count, expected_quorum, voters]
+      properties:
+        voters_count:     { type: integer, minimum: 0 }
+        expected_quorum:  { type: integer, minimum: 1, nullable: true }
+        voters:
+          type: array
+          items: { $ref: '#/components/schemas/VoterReceiptSummary' }
+
+    QuorumUpdateRequest:
+      type: object
+      required: [expected_quorum]
+      properties:
+        expected_quorum:
+          oneOf:
+            - { type: integer, minimum: 1 }
+            - { type: 'null' }
+          description: "Valor entero ≥ 1 para fijarlo, o null para limpiarlo."
+
+    BulkProposalsRequest:
+      type: object
+      required: [proposal_ids]
+      properties:
+        proposal_ids:
+          type: array
+          items: { type: integer, minimum: 1 }
+          minItems: 1
+          maxItems: 200
+
+    BulkProposalsResult:
+      type: object
+      required: [affected, bulk_group_id]
+      properties:
+        affected:
+          type: integer
+          minimum: 0
+          description: "Número de propuestas que cambiaron de estado."
+        bulk_group_id:
+          type: string
+          description: |
+            UUID corto compartido por las N entradas de audit emitidas
+            (una por propuesta). Sólo informativo, no se persiste fuera
+            del log.
+        skipped:
+          type: array
+          items:
+            type: object
+            properties:
+              proposal_id: { type: integer }
+              reason:      { type: string, description: "p.ej. 'not_votable' o 'not_found'" }
+
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail: { type: string }
+
+security:
+  - sessionCookie: []
+
+paths:
+
+  /api/admin/dashboard:
+    get:
+      tags: [admin, dashboard]
+      summary: Datos agregados del dashboard administrativo.
+      description: |
+        Combina (1) estado del periodo (con aforo configurado si lo hay),
+        (2) contadores de propuestas, (3) papeletas emitidas (COUNT
+        agregado de `vote_receipts`), (4) últimas 5 entradas del audit
+        log. **NO** consulta `vote_scores`.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DashboardData' }
+        '403':
+          description: No admin.
+
+  /api/admin/participation:
+    get:
+      tags: [admin, participation]
+      summary: Lista de personas que ya han votado (sólo en `abierto`).
+      description: |
+        Devuelve la lista cronológica de emails que han votado en el
+        periodo actual + aforo configurado.
+
+        **Restricciones constitucionales (Principio I)**:
+        - El handler NUNCA accede a `vote_scores`.
+        - El response NUNCA contiene `score`, `scores`, `ballot_uuid`,
+          ni `proposal_id`.
+        - El timestamp `voted_at` se devuelve con precisión de minuto
+          (segundos forzados a `:00`), tal como se persiste.
+
+        Disponible sólo con estado `abierto`. En otros estados devuelve
+        409.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParticipationData' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no abierto. }
+
+  /api/admin/period/quorum:
+    patch:
+      tags: [admin, period]
+      summary: Establece o limpia el aforo esperado.
+      description: |
+        Disponible sólo con estado `abierto`. Persiste el valor en
+        `periods.expected_quorum`. Loguea `PERIOD_QUORUM_SET` con
+        `details = {"old": int|null, "new": int|null}`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuorumUpdateRequest' }
+      responses:
+        '204': { description: OK. }
+        '403': { description: No admin. }
+        '409': { description: Periodo no abierto. }
+        '422':
+          description: Valor inválido (debe ser entero ≥ 1 o null).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/admin/proposals/bulk-exclude:
+    post:
+      tags: [admin, proposals]
+      summary: Excluye múltiples propuestas en una sola transacción.
+      description: |
+        Sólo en estado `preparacion`. Cambia `status` a `excluded` para
+        cada propuesta cuyo estado actual sea `votable`; las que no
+        cumplan se devuelven en `skipped`. Audit log emite **una entrada
+        `PROPOSAL_EXCLUDE` por propuesta afectada** dentro de la misma
+        transacción, todas con el mismo `details.bulk_group_id`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkProposalsRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkProposalsResult' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }
+
+  /api/admin/proposals/bulk-restore:
+    post:
+      tags: [admin, proposals]
+      summary: Restaura múltiples propuestas excluidas a `votable`.
+      description: |
+        Mismo contrato que `bulk-exclude` pero hacia `votable`. Las que
+        no estén en `excluded` se devuelven en `skipped`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkProposalsRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkProposalsResult' }
+        '403': { description: No admin. }
+        '409': { description: Periodo no en preparacion. }

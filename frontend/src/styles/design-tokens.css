@@ -1,0 +1,207 @@
+/* ──────────────────────────────────────────────────────────────────────────
+ * Kratos — Design Tokens
+ * ──────────────────────────────────────────────────────────────────────────
+ * Tokens semánticos centralizados. Cambia aquí y se propaga al sistema.
+ * Light mode único (MVP, según brief). Accesibilidad: contrastes AA verificados.
+ *
+ * NOTA: paleta y tipografía son placeholders neutros hasta que se incorporen
+ * los assets oficiales de Phicus. Cuando lleguen, sólo hay que sustituir los
+ * valores brutos en la sección "Raw scale" — los tokens semánticos no cambian.
+ */
+
+:root {
+  /* ── Raw scale: gris cálido neutro ───────────────────────────────────── */
+  --gray-0:   #ffffff;
+  --gray-50:  #faf9f7;
+  --gray-100: #f3f1ed;
+  --gray-200: #e8e5df;
+  --gray-300: #d6d2ca;
+  --gray-400: #a8a39a;
+  --gray-500: #76716a;
+  --gray-600: #534f49;
+  --gray-700: #3a3733;
+  --gray-800: #25231f;
+  --gray-900: #15140f;
+
+  /* ── Raw scale: brand primary (teal-blue técnico) ────────────────────── */
+  --brand-50:  #ecf6f7;
+  --brand-100: #d4ebed;
+  --brand-200: #a8d6db;
+  --brand-300: #6bb6bf;
+  --brand-400: #3a949f;
+  --brand-500: #1f7a86;   /* base */
+  --brand-600: #16606b;
+  --brand-700: #114b54;
+  --brand-800: #0d3a41;
+  --brand-900: #082a30;
+
+  /* ── Raw scale: acento (coral — sólo destacados puntuales) ───────────── */
+  --accent-50:  #fef1ec;
+  --accent-100: #fcdacc;
+  --accent-300: #f29874;
+  --accent-500: #e36a3a;   /* base — "pelea de gallos" */
+  --accent-700: #a8421c;
+
+  /* ── Raw scale: éxito / aviso / peligro ──────────────────────────────── */
+  --success-50:  #e8f5ee;
+  --success-500: #2f8f55;
+  --success-700: #1f6b3e;
+
+  --warning-50:  #fdf4dd;
+  --warning-500: #b4801b;
+  --warning-700: #8a5e10;
+
+  --danger-50:   #fdecec;
+  --danger-500:  #c83838;
+  --danger-700:  #962020;
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * Tokens semánticos — usar SIEMPRE estos en componentes, no los raw.
+   * ────────────────────────────────────────────────────────────────────── */
+
+  /* Superficies */
+  --color-background:        var(--gray-50);
+  --color-surface:           var(--gray-0);
+  --color-surface-raised:    var(--gray-0);
+  --color-surface-sunken:    var(--gray-100);
+  --color-surface-muted:     var(--gray-100);
+
+  /* Texto */
+  --color-text:              var(--gray-900);
+  --color-text-secondary:    var(--gray-600);
+  --color-text-muted:        var(--gray-500);
+  --color-text-disabled:     var(--gray-400);
+  --color-text-on-primary:   var(--gray-0);
+  --color-text-on-accent:    var(--gray-0);
+
+  /* Bordes */
+  --color-border:            var(--gray-200);
+  --color-border-strong:     var(--gray-300);
+  --color-border-focus:      var(--brand-500);
+
+  /* Primario / acento */
+  --color-primary:           var(--brand-500);
+  --color-primary-hover:     var(--brand-600);
+  --color-primary-active:    var(--brand-700);
+  --color-primary-soft:      var(--brand-50);
+  --color-primary-soft-text: var(--brand-700);
+
+  --color-accent:            var(--accent-500);
+  --color-accent-soft:       var(--accent-50);
+  --color-accent-soft-text:  var(--accent-700);
+
+  /* Estado */
+  --color-success:           var(--success-500);
+  --color-success-soft:      var(--success-50);
+  --color-success-text:      var(--success-700);
+
+  --color-warning:           var(--warning-500);
+  --color-warning-soft:      var(--warning-50);
+  --color-warning-text:      var(--warning-700);
+
+  --color-danger:            var(--danger-500);
+  --color-danger-soft:       var(--danger-50);
+  --color-danger-text:       var(--danger-700);
+
+  /* Focus ring */
+  --color-focus-ring:        rgba(31, 122, 134, 0.32);
+
+  /* ── Tipografía ──────────────────────────────────────────────────────── */
+  --font-display: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-body:    "Geist", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --text-xs:   0.75rem;    /* 12px — labels, meta */
+  --text-sm:   0.875rem;   /* 14px — UI secundaria */
+  --text-base: 1rem;       /* 16px — cuerpo */
+  --text-lg:   1.125rem;   /* 18px — cuerpo destacado */
+  --text-xl:   1.375rem;   /* 22px — h3 */
+  --text-2xl:  1.75rem;    /* 28px — h2 */
+  --text-3xl:  2.25rem;    /* 36px — h1 */
+  --text-4xl:  3rem;       /* 48px — display */
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed:1.65;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+
+  /* ── Espaciado (escala 4-base) ───────────────────────────────────────── */
+  --space-0:  0;
+  --space-1:  0.25rem;   /* 4 */
+  --space-2:  0.5rem;    /* 8 */
+  --space-3:  0.75rem;   /* 12 */
+  --space-4:  1rem;      /* 16 */
+  --space-5:  1.25rem;   /* 20 */
+  --space-6:  1.5rem;    /* 24 */
+  --space-8:  2rem;      /* 32 */
+  --space-10: 2.5rem;    /* 40 */
+  --space-12: 3rem;      /* 48 */
+  --space-16: 4rem;      /* 64 */
+  --space-20: 5rem;      /* 80 */
+
+  /* ── Radios ──────────────────────────────────────────────────────────── */
+  --radius-xs:    4px;
+  --radius-sm:    6px;
+  --radius-md:    8px;
+  --radius-lg:    10px;
+  --radius-xl:    14px;
+  --radius-2xl:   20px;
+  --radius-pill:  999px;
+  --radius-card:  var(--radius-lg);
+  --radius-control: var(--radius-sm);
+
+  /* ── Sombras (sutiles, capa única) ───────────────────────────────────── */
+  --shadow-xs:  0 1px 2px rgba(20, 19, 15, 0.04);
+  --shadow-sm:  0 1px 2px rgba(20, 19, 15, 0.05), 0 1px 1px rgba(20, 19, 15, 0.03);
+  --shadow-md:  0 2px 6px rgba(20, 19, 15, 0.06), 0 1px 2px rgba(20, 19, 15, 0.04);
+  --shadow-lg:  0 8px 24px rgba(20, 19, 15, 0.08), 0 2px 6px rgba(20, 19, 15, 0.04);
+  --shadow-xl:  0 16px 40px rgba(20, 19, 15, 0.10), 0 4px 12px rgba(20, 19, 15, 0.05);
+  --shadow-card: var(--shadow-sm);
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --duration-instant: 80ms;
+  --duration-fast:    140ms;
+  --duration-base:    220ms;
+  --duration-slow:    320ms;
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ── Z-index ─────────────────────────────────────────────────────────── */
+  --z-base:    0;
+  --z-sticky:  20;
+  --z-overlay: 40;
+  --z-modal:   60;
+  --z-toast:   80;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * Reset mínimo + base
+ * ────────────────────────────────────────────────────────────────────────── */
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Foco visible global — accesibilidad AA */
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

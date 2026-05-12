@@ -1,0 +1,23 @@
+@import './design-tokens.css';
+@import './admin.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body text-fg;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+  /* Foco visible global — accesibilidad AA */
+  :focus-visible {
+    @apply outline-none shadow-focus;
+  }
+  /* Tabular nums en datos numéricos */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}

@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+*.log
+
+# Data + secrets
+.env
+.env.local
+.env.backup
+backend/data/voting.db*
+backend/data/*.db-journal
+backend/data/*.db-wal
+backend/data/*.db-shm
+
+# Bundles & cache
+backend/src/kratos/static/
+*.bin
+/tmp/phicus-design/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# Test artifacts
+coverage/
+.coverage
+htmlcov/
+playwright-report/
+test-results/
