@@ -17,15 +17,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Backend deps first for layer caching
-COPY backend/pyproject.toml ./backend/pyproject.toml
-RUN pip install --upgrade pip && pip install ./backend
-
-# Source
+# Source + built frontend. The backend package uses a src/ layout, so the
+# package sources must be present before `pip install ./backend`.
 COPY backend/ ./backend/
-
-# Frontend dist served as static
 COPY --from=frontend-build /app/frontend/dist /app/backend/src/kratos/static
+
+RUN pip install --upgrade pip && pip install ./backend
 
 # Data dir (mounted volume in production)
 RUN mkdir -p /app/backend/data
