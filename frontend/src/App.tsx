@@ -63,9 +63,9 @@ function AppRoutes() {
       <Route path="/login" element={me ? <Navigate to="/" replace /> : <Login />} />
 
       <Route path="/" element={<HomeRouter me={me} periodClosed={periodClosed} />} />
-      <Route path="/already-voted" element={<AlreadyVoted />} />
-      <Route path="/period-not-open" element={<PeriodNotOpen />} />
-      <Route path="/period-closed" element={<PeriodClosed />} />
+      <Route path="/already-voted" element={<AlreadyVoted me={me} />} />
+      <Route path="/period-not-open" element={<PeriodNotOpen me={me} />} />
+      <Route path="/period-closed" element={<PeriodClosed me={me} />} />
       <Route path="/results" element={<Results me={me} />} />
 
       <Route path="/admin" element={<AdminShell me={me!} loading={meLoading} />}>
@@ -77,7 +77,7 @@ function AppRoutes() {
         <Route path="audit" element={<AdminAuditLog />} />
       </Route>
 
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<NotFound me={me} />} />
     </Routes>
   );
 }
@@ -88,7 +88,7 @@ function HomeRouter({ me, periodClosed }: { me: Me | null; periodClosed: boolean
   if (periodClosed) return <Results me={me} />;
   // Sin sesión y periodo NO cerrado, la guarda superior ya redirigió a /login.
   if (!me) return null;
-  if (me.has_voted) return <AlreadyVoted />;
-  if (me.period_state === 'preparacion') return <PeriodNotOpen />;
+  if (me.has_voted) return <AlreadyVoted me={me} />;
+  if (me.period_state === 'preparacion') return <PeriodNotOpen me={me} />;
   return <Vote me={me} />;
 }

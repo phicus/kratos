@@ -1,9 +1,10 @@
 import { CheckCircle2 } from 'lucide-react';
 import { AppShell } from '../components/AppShell';
+import type { Me } from '../api/types';
 
-export function AlreadyVoted() {
+export function AlreadyVoted({ me }: { me?: Me | null }) {
   return (
-    <AppShell>
+    <AppShell me={me}>
       <div className="flex flex-col items-center text-center gap-4 py-10">
         <div className="w-16 h-16 rounded-pill bg-success-soft text-success-text flex items-center justify-center">
           <CheckCircle2 className="w-8 h-8" />

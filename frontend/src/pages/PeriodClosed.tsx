@@ -2,10 +2,11 @@ import { Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { Button } from '../components/ui/Button';
+import type { Me } from '../api/types';
 
-export function PeriodClosed() {
+export function PeriodClosed({ me }: { me?: Me | null }) {
   return (
-    <AppShell>
+    <AppShell me={me}>
       <div className="flex flex-col items-center text-center gap-4 py-10">
         <div className="w-16 h-16 rounded-pill bg-surface-sunken text-fg-muted flex items-center justify-center">
           <Lock className="w-8 h-8" />
